@@ -15,6 +15,7 @@
 		D87E4E73285A06BD00BBEAA8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D87E4E71285A06BD00BBEAA8 /* LaunchScreen.storyboard */; };
 		D87E4E7B285A383600BBEAA8 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4E7A285A383600BBEAA8 /* Event.swift */; };
 		D87E4E7D285A386300BBEAA8 /* Disposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4E7C285A386300BBEAA8 /* Disposable.swift */; };
+		D87E4E7F285B1DC200BBEAA8 /* Sink.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4E7E285B1DC200BBEAA8 /* Sink.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		D87E4E74285A06BD00BBEAA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D87E4E7A285A383600BBEAA8 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		D87E4E7C285A386300BBEAA8 /* Disposable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disposable.swift; sourceTree = "<group>"; };
+		D87E4E7E285B1DC200BBEAA8 /* Sink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sink.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				D87E4E66285A06BB00BBEAA8 /* AppDelegate.swift */,
 				D87E4E68285A06BB00BBEAA8 /* SceneDelegate.swift */,
 				D87E4E6A285A06BB00BBEAA8 /* ViewController.swift */,
+				D87E4E7E285B1DC200BBEAA8 /* Sink.swift */,
 				D87E4E7A285A383600BBEAA8 /* Event.swift */,
 				D87E4E7C285A386300BBEAA8 /* Disposable.swift */,
 				D87E4E6C285A06BB00BBEAA8 /* Main.storyboard */,
@@ -146,6 +149,7 @@
 			files = (
 				D87E4E7B285A383600BBEAA8 /* Event.swift in Sources */,
 				D87E4E6B285A06BB00BBEAA8 /* ViewController.swift in Sources */,
+				D87E4E7F285B1DC200BBEAA8 /* Sink.swift in Sources */,
 				D87E4E7D285A386300BBEAA8 /* Disposable.swift in Sources */,
 				D87E4E67285A06BB00BBEAA8 /* AppDelegate.swift in Sources */,
 				D87E4E69285A06BB00BBEAA8 /* SceneDelegate.swift in Sources */,

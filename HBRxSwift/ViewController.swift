@@ -7,45 +7,45 @@
 
 import UIKit
 
-protocol ObserverType {
+protocol SubscriberType {
     associatedtype Element
 
-    func on(event: Event<Element>)
+    func sub(event: Event<Element>)
 }
 
-class Observer<Element>: ObserverType {
+class Subscriber<Element>: SubscriberType {
     private let _handler: (Event<Element>) -> Void
     
     init(_handler: @escaping (Event<Element>) -> Void) {
         self._handler = _handler
     }
     
-    func on(event: Event<Element>) {
+    func sub(event: Event<Element>) {
         _handler(event)
     }
 }
 
-protocol ObservableType {
+protocol PublishableType {
     associatedtype Element
     
-    func subscribe<O: ObserverType>(observer: O) -> Disposable where O.Element == Element
+    func pub<S: SubscriberType>(subscriber: S) -> Disposable where S.Element == Element
 }
 
-class Observable<Element>: ObservableType {
+class Publisher<Element>: PublishableType {
     
-    private let _eventGenerator: (Observer<Element>) -> Disposable
+    private let _eventGenerator: (Subscriber<Element>) -> Disposable
     
-    init(_eventGenerator: @escaping (Observer<Element>) -> Disposable) {
+    init(_eventGenerator: @escaping (Subscriber<Element>) -> Disposable) {
         self._eventGenerator = _eventGenerator
     }
     
-    func subscribe<O: ObserverType>(observer: O) -> Disposable where O.Element == Element {
+    func pub<S: SubscriberType>(subscriber: S) -> Disposable where S.Element == Element {
         let compositeDisposable = CompositeDisposable()
-        let disposable = _eventGenerator(Observer { event in
+        let disposable = _eventGenerator(Subscriber { event in
             guard !compositeDisposable.isDisposed else {
                 return
             }
-            observer.on(event: event)
+            subscriber.sub(event: event)
             switch event {
             case .error, .finished:
                 compositeDisposable.dispose()
@@ -63,14 +63,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let observable = Observable<Int> { observer -> Disposable in
-            observer.on(event: .next(1))
-            observer.on(event: .next(2))
-            observer.on(event: .next(3))
-            observer.on(event: .next(4))
+        let publisher = Publisher<Int> { subscriber -> Disposable in
+            subscriber.sub(event: .next(1))
+            subscriber.sub(event: .next(2))
+            subscriber.sub(event: .next(3))
+            subscriber.sub(event: .next(4))
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                observer.on(event: .finished)
+                subscriber.sub(event: .finished)
             }
             
             return AnonymousDisposable {
@@ -78,7 +78,7 @@ class ViewController: UIViewController {
             }
         }
         
-        let observer = Observer<Int> { event in
+        let subscriber = Subscriber<Int> { event in
             switch event {
             case .next(let value):
                 print("next(\(value))")
@@ -89,7 +89,7 @@ class ViewController: UIViewController {
             }
         }
         
-        let disposable = observable.subscribe(observer: observer)
+        let disposable = publisher.pub(subscriber: subscriber)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             disposable.dispose()
         }
