@@ -7,12 +7,6 @@
 
 import UIKit
 
-enum Event<Element> {
-    case next(Element)
-    case error(Error)
-    case finished
-}
-
 protocol ObserverType {
     associatedtype Element
 
@@ -34,18 +28,33 @@ class Observer<Element>: ObserverType {
 protocol ObservableType {
     associatedtype Element
     
-    func subscribe<O: ObserverType>(observer: O) where O.Element == Element
+    func subscribe<O: ObserverType>(observer: O) -> Disposable where O.Element == Element
 }
 
 class Observable<Element>: ObservableType {
-    private let _eventGenerator: (Observer<Element>) -> Void
     
-    init(_eventGenerator: @escaping (Observer<Element>) -> Void) {
+    private let _eventGenerator: (Observer<Element>) -> Disposable
+    
+    init(_eventGenerator: @escaping (Observer<Element>) -> Disposable) {
         self._eventGenerator = _eventGenerator
     }
     
-    func subscribe<O>(observer: O) where O : ObserverType, Element == O.Element {
-        _eventGenerator(observer as! Observer<Element>)
+    func subscribe<O: ObserverType>(observer: O) -> Disposable where O.Element == Element {
+        let compositeDisposable = CompositeDisposable()
+        let disposable = _eventGenerator(Observer { event in
+            guard !compositeDisposable.isDisposed else {
+                return
+            }
+            observer.on(event: event)
+            switch event {
+            case .error, .finished:
+                compositeDisposable.dispose()
+            default:
+                break
+            }
+        })
+        compositeDisposable.add(disposable)
+        return disposable
     }
 }
 
@@ -54,10 +63,19 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let observable = Observable<Int> { observer in
+        let observable = Observable<Int> { observer -> Disposable in
             observer.on(event: .next(1))
             observer.on(event: .next(2))
             observer.on(event: .next(3))
+            observer.on(event: .next(4))
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                observer.on(event: .finished)
+            }
+            
+            return AnonymousDisposable {
+                print("Anonymous Dispose")
+            }
         }
         
         let observer = Observer<Int> { event in
@@ -71,9 +89,10 @@ class ViewController: UIViewController {
             }
         }
         
-        observable.subscribe(observer: observer)
+        let disposable = observable.subscribe(observer: observer)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            disposable.dispose()
+        }
     }
-
-
 }
 
