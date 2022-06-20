@@ -7,6 +7,9 @@
 
 import UIKit
 
+// Subscriber => Observer
+// Publisher  => Observable
+
 protocol SubscriberType {
     associatedtype Element
 
@@ -16,7 +19,7 @@ protocol SubscriberType {
 class Subscriber<Element>: SubscriberType {
     private let _handler: (Event<Element>) -> Void
     
-    init(_handler: @escaping (Event<Element>) -> Void) {
+    init(_ _handler: @escaping (Event<Element>) -> Void) {
         self._handler = _handler
     }
     
@@ -40,21 +43,9 @@ class Publisher<Element>: PublishableType {
     }
     
     func pub<S: SubscriberType>(subscriber: S) -> Disposable where S.Element == Element {
-        let compositeDisposable = CompositeDisposable()
-        let disposable = _eventGenerator(Subscriber { event in
-            guard !compositeDisposable.isDisposed else {
-                return
-            }
-            subscriber.sub(event: event)
-            switch event {
-            case .error, .finished:
-                compositeDisposable.dispose()
-            default:
-                break
-            }
-        })
-        compositeDisposable.add(disposable)
-        return disposable
+        let sink = Sink(forward: subscriber, eventGenerator: _eventGenerator)
+        sink.run()
+        return sink
     }
 }
 
@@ -90,6 +81,7 @@ class ViewController: UIViewController {
         }
         
         let disposable = publisher.pub(subscriber: subscriber)
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             disposable.dispose()
         }
