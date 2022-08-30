@@ -15,13 +15,16 @@ class ViewController: UIViewController {
     }
 
     func runrx() {
-        let subscriber = Subscriber<Int> { publisher in
+        let subscriber = Subscriber<Int> { publisher -> Disposable in
             publisher.pub(event: .next(1))
             publisher.pub(event: .next(2))
             publisher.pub(event: .next(3))
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 publisher.pub(event: .finish)
+            }
+            return AnonymouseDisposable {
+                print("AnonymouseDisposable")
             }
         }
         
@@ -36,7 +39,10 @@ class ViewController: UIViewController {
             }
         }
         
-        subscriber.subscribe(publisher: publisher)
+        let dispoable = subscriber.subscribe(publisher: publisher)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            dispoable.dispose()
+        }
     }
 }
 
