@@ -20,7 +20,7 @@ class ViewController: UIViewController {
             publisher.pub(event: .next(2))
             publisher.pub(event: .next(3))
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 publisher.pub(event: .finish)
             }
             return AnonymouseDisposable {
@@ -40,7 +40,7 @@ class ViewController: UIViewController {
         }
         
         let dispoable = subscriber.subscribe(publisher: publisher)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             dispoable.dispose()
         }
     }

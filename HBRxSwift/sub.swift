@@ -22,18 +22,8 @@ class Subscriber<Element>: SubscriberType {
     }
     
     func subscribe<P: PublisherType>(publisher: P) -> Disposable where P.Element == Element {
-        let compositeDisposable = CompositeDisposable()
-        let disposable = _eventGenerator(Publisher { event in
-            guard !compositeDisposable.isDisposed else { return }
-            publisher.pub(event: event)
-            switch event {
-            case .error(_), .finish:
-                compositeDisposable.dispose()
-            default:
-                break
-            }
-        })
-        compositeDisposable.add(disposable: disposable)
-        return compositeDisposable
+        let sink = Sink(forward: publisher, eventGenerator: _eventGenerator)
+        sink.run()
+        return sink
     }
 }
