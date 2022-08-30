@@ -11,9 +11,32 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        runrx()
     }
 
-
+    func runrx() {
+        let subscriber = Subscriber<Int> { publisher in
+            publisher.pub(event: .next(1))
+            publisher.pub(event: .next(2))
+            publisher.pub(event: .next(3))
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                publisher.pub(event: .finish)
+            }
+        }
+        
+        let publisher = Publisher<Int> { (event) in
+            switch event {
+            case .next(let value):
+                print("receive next \(value)")
+            case .error(let error):
+                print("receive error \(error)")
+            case .finish:
+                print("receive finish")
+            }
+        }
+        
+        subscriber.subscribe(publisher: publisher)
+    }
 }
 
